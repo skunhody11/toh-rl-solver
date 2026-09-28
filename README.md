@@ -21,8 +21,8 @@ interface.
   current best actions.
 - **`custom_epsilon`** / **`custom_alpha`** — decay schedules for the
   exploration rate and learning rate. Epsilon decays from ~1.0 toward a
-  floor of 0.01 (satisfying GLIE — greedy in the limit with infinite
-  exploration); alpha decays from 1.0 toward 0 so early noisy estimates
+  floor of 0.01, so the agent explores broadly early on but never stops
+  exploring entirely; alpha decays from 1.0 toward 0 so early noisy estimates
   get overwritten quickly while later updates refine convergence.
 - **`exploration_fn`** / **`choose_next_action_with_exploration_fn`** —
   a UCB-style exploration bonus, `u + c/√(n+1)`, that prioritizes
@@ -38,13 +38,11 @@ are written against that environment's interface (`TohMdp`, `TohState`,
 `VTable`, `QTable`, etc.) and expect the same contract described in the
 docstrings and type hints.
 
-## Notes on results
+## Exploration strategies
 
-Across three exploration strategies (constant ε=0.2, a decaying custom
-ε schedule, and the UCB-style exploration function) trained for 10,000
-steps on a 3-disk, 20%-noise version of the MDP, the exploration-function
-approach converged to the highest Q-values along the solution path,
-consistent with its bias toward resolving uncertainty in
-under-visited states rather than exploring at random. All three
-strategies converged to similar policies given enough steps, differing
-mainly in how efficiently they got there.
+The code supports three ways of balancing exploration and exploitation
+during Q-Learning: a constant epsilon, a decaying custom epsilon
+schedule, and the UCB-style exploration function. The custom schedules
+are simple 1/(1 + k*n) decays, chosen so early updates move quickly and
+later ones settle. Value Iteration provides a ground-truth benchmark
+that Q-Learning's learned values can be compared against.
